@@ -12,4 +12,20 @@ cloudinary.config(
   }
 );
 
+export const uploadOnCloudinary = async(localFilePath, folder) => {
+  try {
+    if (!localFilePath) throw new ApiError(404, "File resource not exist to upload");
 
+    const res = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto",
+      folder: folder,
+      timeout: 60000
+    });
+
+    delete res.api_key;
+    return res;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
