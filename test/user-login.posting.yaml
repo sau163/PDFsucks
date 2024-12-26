@@ -1,0 +1,14 @@
+name: User Login
+description: The user signin / login route for PDFsuxx
+method: POST
+url: http://localhost:3000/api/v1/user/login
+body:
+  form_data:
+  - name: username
+    value: pirateking
+  - name: password
+    value: onepiece
+  content_type: application/x-www-form-urlencoded
+headers:
+- name: content-type
+  value: application/x-www-form-urlencoded

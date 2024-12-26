@@ -1,0 +1,18 @@
+name: User Registration
+description: The user registration route for PDFsuxx
+method: POST
+url: http://localhost:3000/api/v1/user/register
+body:
+  form_data:
+  - name: fullName
+    value: Gol D. Roger
+  - name: email
+    value: gol.d.roger@gmail.com
+  - name: username
+    value: pirateking
+  - name: password
+    value: onepiece
+  content_type: application/x-www-form-urlencoded
+headers:
+- name: content-type
+  value: application/x-www-form-urlencoded

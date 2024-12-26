@@ -1,6 +1,7 @@
 import express, { urlencoded } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { userRouter } from "./routes/user.route.js";
 
 const app = express();
 app.use(cors(
@@ -16,11 +17,7 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 const apiRoute = express.Router();
-apiRoute.get("/", (req, res) => {
-  return res.json({
-    message: "Allah is alive"
-  });
-});
+apiRoute.use("/user", userRouter);
 
 app.use("/api/v1", apiRoute);
 
