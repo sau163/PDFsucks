@@ -1,0 +1,3 @@
+name: User Logout
+description: The user logout route for PDFsuxx api
+url: http://localhost:3000/api/v1/user/logout
