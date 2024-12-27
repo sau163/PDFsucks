@@ -10,15 +10,21 @@ const asyncHandler = (reqHandler) => {
           .status(error.statusCode || 500)
           .json({
             success: error.success,
-            message: error.message,
-            errors: error.errors
+            statusCode: error.statusCode,
+            errors: error.errors,
+            stack: error.stack.trim(),
+            message: error.message
         });
       } else {
+        otherError = new ApiError(500, error.message, error.name, error.stack);
         return res
-          .status(500)
+          .status(otherError.statusCode)
           .json({
-            success: false,
-            message: error.message
+            success: otherError.success,
+            statusCode: otherError.statusCode,
+            error: otherError.name,
+            stack: otherError.stack.trim(),
+            message: otherError.message
         });
       }
     });
