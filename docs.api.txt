@@ -1,0 +1,32 @@
+Home Route to API: /api/v1
+
+MODELS:
+
+userObject: {fullName: String, email: String, username: String, password: String, refreshToken: String, avatarUrl: String, avatarPublicId: String}
+  isPasswordCorrect: {password: String}
+  generateAccessToken: {}
+  generateRefreshToken: {}
+
+
+HELPER FUNCTIONS:
+
+asyncHandler : {async Function (req, res, next)} : returns a synchronized function : All errors thrown in function are handled here
+
+
+ROUTES:
+
+User: /user
+  /register : POST  : {fullName: String, email: string, username: String, password: String (length >= 8)} :
+  /login    : POST  : {username: String (vapable of both username or password), password: String}
+  /logout   : GET   : {}
+
+
+API RESPONSES:
+
+ApiResponse: {statusCode: Integer, data: {}, user: UserObject, message: String}
+ApiError: {success: Boolean, statusCode: Integer, error: String (name of error), stack: String (error stack), message: String (error message)} 
+
+
+COOKIES:
+
+Cookies: {accessToken: String, refreshToken: String}
