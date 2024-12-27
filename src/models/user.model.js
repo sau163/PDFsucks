@@ -4,13 +4,12 @@ import jwt from "jsonwebtoken";
 
 const userSchema = new Schema(
   {
-    username: {
+    fullName: {
       type: String,
       required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-      index: true
+      unique: false,
+      lowercase: false,
+      trim: false
     },
     email: {
       type: String,
@@ -19,12 +18,20 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true
     },
-    fullName: {
+    username: {
       type: String,
       required: true,
-      unique: false,
-      lowercase: false,
-      trim: false
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required!"]
+    },
+    refreshToken: {
+      type: String
     },
     avatarUrl: {
       type: String,
@@ -33,13 +40,6 @@ const userSchema = new Schema(
     avatarPublicId: {
       type: String,
       required: false
-    },
-    password: {
-      type: String,
-      required: [true, "Password is required!"]
-    },
-    refreshToken: {
-      type: String
     }
   },
   {
