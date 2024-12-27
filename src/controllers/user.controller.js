@@ -50,7 +50,7 @@ export const userRegistration = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        "",
+        {},
         "user created successfully",
         createdUser._doc
       )
@@ -85,9 +85,41 @@ export const userLogin = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        "",
+        {},
         "user logged in successfully",
         loggedInUser._doc
+      )
+    );
+});
+
+export const userLogout = asyncHandler(async (req, res) => {
+  // Algorithm
+  // 1. If not for cookies, user would have to logout every time
+  // 2. Therefore, delete cookies and req.user, hence user logged out
+  // 3. Also, if user logged out, there is no active refreshToken, hence update refreshToken in User model to empty
+
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        refreshToken: ""
+      }
+    },
+    {
+      new: true
+    }
+  );
+  
+  return res
+    .status(200)
+    .clearCookie("accessToken", COOKIE_OPTIONS)
+    .clearCookie("refreshToken", COOKIE_OPTIONS)
+    .json(
+      new ApiResponse(
+        200,
+        {},
+        "user logged out successfully",
+        {}
       )
     );
 });

@@ -3,7 +3,6 @@ import { User } from "../models/user.model.js";
 import {COOKIE_OPTIONS} from "../constants.js";
 import { generateAccessRefreshTokens } from "../utils/accessRefreshTokenGeneration.util.js";
 import { ApiResponse } from "../utils/response.util.js";
-import { asyncHandler } from "../utils/asyncHandler.util.js";
 
 // Algorithm
 // 1. if user have session cookies: accessToken, no login needed
@@ -11,7 +10,8 @@ import { asyncHandler } from "../utils/asyncHandler.util.js";
 // 3. If both fails, next() as user needs to login
 // 4. If user has valid tokens, append that info into req.body and return as no need to relogin
 
-export const userSession = asyncHandler(async (req, res, next) => {
+// DON'T USE ASYNCHANDLER HERE! Fuck JavaScript! The call won't become async with asyncHandler, which is needed for verifyJWT
+export const userSession = async (req, res, next) => {
   const cookieAccessToken = req.cookies.accessToken || (req.header("Authorization") || "").replace("Bearer", "").trim();
   const cookieRefreshToken = req.cookies.refreshToken;
 
@@ -33,18 +33,19 @@ export const userSession = asyncHandler(async (req, res, next) => {
         delete loggedInUser._doc.password;
         delete loggedInUser._doc.refreshToken;
 
-        return res
+        return next ?
+          res
           .status(200)
           .cookie("accessToken", newAccessToken, {...COOKIE_OPTIONS, maxAge: 86400000 * process.env.ACCESS_TOKEN_COOKIE_EXPIRY}) // 1 Day
           .cookie("refreshToken", newRefreshToken, {...COOKIE_OPTIONS, maxAge: 86400000 * Number(process.env.REFRESH_TOKEN_COOKIE_EXPIRY)}) // 10 Days
           .json(
             new ApiResponse(
               200,
-              "",
+              {},
               "user already logged in",
               loggedInUser._doc
             )
-          );
+          ) : loggedInUser._doc;
       } catch (error) {
         return next ? next() : false;
       } 
@@ -53,21 +54,23 @@ export const userSession = asyncHandler(async (req, res, next) => {
 
   let tokenUser = await User.findById(decodedAccessToken._id);
   if (!tokenUser) return next ? next() : false;
+
   const { accessToken: newAccessToken, refreshToken: newRefreshToken, user } = await generateAccessRefreshTokens(tokenUser);
   const loggedInUser = { ...user };
   delete tokenUser._doc.password;
   delete loggedInUser._doc.refreshToken;
 
-  return res
+  return next ?
+    res
     .status(200)
-    .cookie("accessToken", newAccessToken, {COOKIE_OPTIONS, maxAge: 86400000 * process.env.ACCESS_TOKEN_COOKIE_EXPIRY}) // 1 Day
-    .cookie("refreshToken", newRefreshToken, {COOKIE_OPTIONS, maxAge: 86400000 * process.env.REFRESH_TOKEN_COOKIE_EXPIRY}) // 10 Days
+    .cookie("accessToken", newAccessToken, {...COOKIE_OPTIONS, maxAge: 86400000 * process.env.ACCESS_TOKEN_COOKIE_EXPIRY}) // 1 Day
+    .cookie("refreshToken", newRefreshToken, {...COOKIE_OPTIONS, maxAge: 86400000 * Number(process.env.REFRESH_TOKEN_COOKIE_EXPIRY)}) // 10 Days
     .json(
       new ApiResponse(
         200,
-        "",
+        {},
         "user already logged in",
         loggedInUser._doc
       )
-    );
-});
+    ) : loggedInUser._doc;
+}
